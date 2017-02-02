@@ -105,7 +105,7 @@ our documentation, so this may need to be installed using `pip install sphinx_rt
 
 We use pytest for testing. Tests can be run from the top-level directory using:
 ```
-pytest --cov=pyquil
+py.test --cov=pyquil
 ```
 
 ## How to cite pyQuil and Forest

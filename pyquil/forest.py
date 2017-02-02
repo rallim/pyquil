@@ -220,7 +220,7 @@ class Connection(object):
                            Y, or Z gate getting applied to each qubit after a gate application or
                            reset. (default None)
         :param measurement_noise: A list of three numbers [Px, Py, Pz] indicating the probability of
-                                  an X, Y, or Z gate getting applied before a a measurement.
+                                  an X, Y, or Z gate getting applied before a measurement.
                                   (default None)
         :param num_retries: The number of times to retry a request when faced with an HTTP response
                             code in [502, 503, 504, 521, 523] (default 3)
@@ -313,7 +313,7 @@ class Connection(object):
         Simulate a Quil program and get the wavefunction back.
         :param quil_program: A Quil program.
         :param classical_addresses: An optional list of classical addresses.
-        :return: A tuple whose first element is a a NumPy array of amplitudes,
+        :return: A tuple whose first element is a NumPy array of amplitudes,
                  and whose second element is the list of classical bits corresponding
                  to the classical addresses.
         """

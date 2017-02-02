@@ -347,7 +347,7 @@ class JumpTarget(AbstractInstruction):
 
 class JumpConditional(AbstractInstruction):
     """
-    Abstract representation of an conditional jump instruction.
+    Abstract representation of a conditional jump instruction.
     """
 
     def __init__(self, target, condition):
@@ -414,7 +414,7 @@ class Reset(SimpleInstruction):
 
 class Nop(SimpleInstruction):
     """
-    The RESET instruction.
+    The NOP instruction.
     """
     op = "NOP"
 
