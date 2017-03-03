@@ -57,6 +57,18 @@ class Program(InstructionGroup):
         else:
             return super(Program, self).__add__(other)
 
+    def include(self, filepath):
+        """
+        Include a local file in the Program.
+
+        :param filepath: (str) The full path to the file.
+        :return: The Program instance.
+        """
+        with open(filepath) as fp:
+            for line in fp:
+                self.inst(line.rstrip('\n'))
+        return self
+
     def defgate(self, name, matrix):
         """
         Define a new static gate.
