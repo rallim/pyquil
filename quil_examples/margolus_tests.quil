@@ -1,0 +1,7 @@
+# circuit tester calls this for each test case 
+DEFCIRCUIT TEST_CIRCUIT_3Q Q2 Q1 Q0:
+    MARGOLUS Q2 Q1 Q0
+
+# user calls this to run all tests
+DEFCIRCUIT MARGOLUS_TESTS Q2 Q1 Q0:
+    CIRCUIT_TESTER_3Q Q2 Q1 Q0

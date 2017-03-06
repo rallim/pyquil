@@ -1,0 +1,150 @@
+#
+#
+# A Quil library for testing circuits
+#
+# A test harness is demonstrated here for 3-qubit circuits; it
+# uses 24 bits of classical memory to house the test cases and 
+# measurement results. The user-specified test circuit is (by 
+# default) exercised on every element of the computational basis 
+# in one request. pyQuil could generate similar definitions for 
+# N-qubit circuits that would use N*2^N classical bits.
+#
+# User implements a TEST_CIRCUIT_3Q definition that will be run by 
+# the circuit tester on various elements of the computational basis:
+#
+# # circuit tester calls this for each test case 
+# DEFCIRCUIT TEST_CIRCUIT_3Q Q2 Q1 Q0:
+#     # MY_CIRCUIT can use classical memory (and ancilla qubits), 
+#     # but avoid memory segment [0-23] as it is used by the test 
+#     # harness (see Notes).
+#     MY_CIRCUIT Q2 Q1 Q0 [24] [25] ... 
+#
+# Test suite can be run as follows, e.g., on qubits 2 1 and 0:
+#
+# CIRCUIT_TESTER_3Q 2 1 0
+#
+# Measurement results are available in addresses [0-23].
+#
+# Notes:
+#
+# 1) Addresses [0-23] are hard-wired for simplicity at the moment.
+#    Possible to parameterize without using 24 separate parameters?
+#    Passing in a memory segment C such as [100-123] and addressing
+#    bits as C[0],...,C[23] and subsegments as C[0-2],...,C[21-23]
+#    would be useful here.
+#
+# 2) Is there a concise way to initialize a memory segment in Quil?
+#    e.g. 'SET [0-23] 000100...111', in binary, oct, or hex, etc.
+#    See SET_MEMORY_TO_COMPUTATIONAL_BASIS_3Q for comparison. 
+#
+# 3) Consider extending to allow expected results to be checked, 
+#    allow test circuit's own ancillas and memory to be initialized 
+#    and checked. 
+#
+
+DEFCIRCUIT SET_MEMORY_TO_COMPUTATIONAL_BASIS_3Q:
+    #
+    # Initialize classical memory addresses [0-23] to each of 
+    # the 8 computational basis elements on 3 bits:
+    #
+    #   000    -->  [2],[1],[0]
+    #   001    -->  [5],[4],[3]
+    #   010    -->  [8],[7],[6]
+    #   011
+    #   100    ...
+    #   101 
+    #   110 
+    #   111    --> [23],[22],[21]
+    #
+
+    FALSE [0]
+    FALSE [1]
+    FALSE [2]
+    TRUE [3]
+    FALSE [4]
+    FALSE [5]
+    FALSE [6]
+    TRUE [7]
+    FALSE [8]
+    TRUE [9]
+    TRUE [10]
+    FALSE [11]
+    FALSE [12]
+    FALSE [13]
+    TRUE [14]
+    TRUE [15]
+    FALSE [16]
+    TRUE [17]
+    FALSE [18]
+    TRUE [19]
+    TRUE [20]
+    TRUE [21]
+    TRUE [22]
+    TRUE [23]
+ 
+ 
+DEFCIRCUIT INITIALIZE_MEMORY_FOR_TEST_SUITE_3Q:
+    #
+    # Defaults to every element of the computational basis.
+    #
+    # Can override this with a different set of test cases,
+    # perhaps repeating some cases to get multiple samples.
+    # Note: override CIRCUIT_TESTER_3Q correspondingly to run
+    # on additional test cases beyond [0-23].
+    #  
+    SET_MEMORY_TO_COMPUTATIONAL_BASIS_3Q
+
+
+DEFCIRCUIT TEST_CASE_3Q Q2 Q1 Q0 C2 C1 C0:
+    #
+    # Initialize, run, and measure a 3-qubit circuit TEST_CIRCUIT_3Q 
+    # on qubits Q2, Q1, and Q0.
+    #
+    # Initialize qubits to the computational basis state specified 
+    # in classical addresses C2, C1, C0.
+    # 
+    # Run the circuit and measure the qubits back into C2, C1, C0
+    # to store results.
+    #
+
+    # Initialize qubits to the computational basis state
+    # specified in C2, C1, C0.
+    RESET
+    JUMP-UNLESS @NoXQ2 C2
+    X Q2
+    LABEL @NoXQ2
+    JUMP-UNLESS @NoXQ1 C1
+    X Q1
+    LABEL @NoXQ1
+    JUMP-UNLESS @DONE_INIT C0
+    X Q0
+    LABEL @DONE_INIT
+    
+    # Run the test circuit
+    TEST_CIRCUIT_3Q Q2 Q1 Q0
+    
+    # Measure qubits
+    MEASURE Q2 C2
+    MEASURE Q1 C1
+    MEASURE Q0 C0
+
+
+DEFCIRCUIT CIRCUIT_TESTER_3Q Q2 Q1 Q0:
+    #
+    # Initialize classical memory [0-23] to each of the 
+    # 8 computational basis elements on 3 bits, run the 
+    # test circuit on each basis state, and measure the
+    # results back into addresses [0-23].
+    #
+    INITIALIZE_MEMORY_FOR_TEST_SUITE_3Q
+    
+    # Run the circuit on each computational basis element
+    TEST_CASE_3Q Q2 Q1 Q0 [2] [1] [0]
+    TEST_CASE_3Q Q2 Q1 Q0 [5] [4] [3]
+    TEST_CASE_3Q Q2 Q1 Q0 [8] [7] [6]
+    TEST_CASE_3Q Q2 Q1 Q0 [11] [10] [9]
+    TEST_CASE_3Q Q2 Q1 Q0 [14] [13] [12]
+    TEST_CASE_3Q Q2 Q1 Q0 [17] [16] [15]
+    TEST_CASE_3Q Q2 Q1 Q0 [20] [19] [18]
+    TEST_CASE_3Q Q2 Q1 Q0 [23] [22] [21]
+
