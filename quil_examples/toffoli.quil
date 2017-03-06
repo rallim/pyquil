@@ -1,0 +1,37 @@
+DEFGATE CSQRTX:
+    #
+    # A Controlled SQRTX gate, where SQRTX * SQRTX = X
+    #
+    1, 0, 0, 0
+    0, 1, 0, 0
+    0, 0, (1+i)/2, (1-i)/2
+    0, 0, (1-i)/2, (1+i)/2
+
+
+DEFGATE CSQRTXd:
+    #
+    # A Controlled SQRTXd gate, where SQRTX * SQRTXd = I
+    #
+    1, 0, 0, 0
+    0, 1, 0, 0
+    0, 0, (1-i)/2, (1+i)/2
+    0, 0, (1+i)/2, (1-i)/2
+
+
+DEFCIRCUIT TOFFOLI Qc1 Qc2 Qt:
+    #
+    # A TOFFOLI gate
+    #
+    #   Qc1 control qubit 1
+    #   Qc2 control qubit 2
+    #   Qt  target qubit
+    #
+    # Logically, compute a CCNOT on Qc1 Qc2 and Qt
+    #
+    
+    CSQRTX Qc2 Qt
+    CNOT Qc1 Qc2
+    CSQRTXd Qc2 Qt
+    CNOT Qc1 Qc2
+    CSQRTX Qc1 Qt
+    

@@ -1,0 +1,19 @@
+DEFCIRCUIT MARGOLUS Qc1 Qc2 Qt:
+    #
+    # A MARGOLUS gate
+    #
+    #   Qc1 control qubit 1
+    #   Qc2 control qubit 2
+    #   Qt  target qubit
+    #
+    # Logically, compute a CCNOT on Qc1 Qc2 and Qt
+    #
+    
+    RY(pi/4) Qt
+    CNOT Qc2 Qt
+    RY(pi/4) Qt
+    CNOT Qc1 Qt
+    RY(-pi/4) Qt
+    CNOT Qc2 Qt
+    RY(-pi/4) Qt
+    
