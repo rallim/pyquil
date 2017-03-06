@@ -1,0 +1,42 @@
+DEFCIRCUIT DISTRIBUTED_CNOT QAc QBt QAa QBa CAa CBa:
+    #
+    # A distributed CNOT gate
+    #
+    #   QAc control qubit on device A
+    #   QBt target qubit on device B
+    #
+    #   QAa auxiliary qubit on device A, initially |0>
+    #   QAb auxiliary qubit on device B, initially |0>
+    #
+    #   CAa classical address, measures QAa
+    #   CBa classical address, measures QBa
+    #
+    # Logically, compute CNOT on QAc and QBt,
+    # using a shared EPR pair on QAa and QBa, 
+    # and classical communication between A an B.
+    #
+    
+    # Set up an EPR pair on QAa and QBa. Ideally, 
+    # this can be pre-computed and passed in to
+    # the circuit instead. 
+    H QAa
+    CNOT QAa QBa
+    
+    # Move control qubit to processor B with only
+    # classical exchange of CAa
+    CNOT QAc QAa
+    MEASURE QAa CAa
+    JUMP-UNLESS @NOXQBa CAa
+    X QBa
+    LABEL @NOXQBa
+
+    # Perform CNOT on processor B    
+    CNOT QBa QBt
+
+    # Return control qubit to processor A with only
+    # classical exchange of CBa
+    H QBa
+    MEASURE QBa CBa
+    JUMP-UNLESS @NOZQAc CBa
+    Z QAc
+    LABEL @NOZQAc
