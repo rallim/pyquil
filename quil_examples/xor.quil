@@ -1,0 +1,10 @@
+
+DEFCIRCUIT XOR C1 C2 C3:
+    # Compute the XOR of C1 and C2 into C2 using auxiliary C3, keeping C1
+    MOVE C2 C3
+    OR C1 C2
+    NOT C1
+    NOT C3
+    OR C1 C3
+    AND C3 C2
+    NOT C1

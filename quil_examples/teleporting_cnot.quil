@@ -1,0 +1,80 @@
+DEFCIRCUIT TELEPORTING_CNOT Qci Qti Qco Qto Qca Qta Cti Cta Cci Cca CXa:
+    #
+    # A teleporting CNOT gate
+    #
+    #   Qci qubit, control input
+    #   Qti qubit, target input
+    #
+    #   Qco qubit, control output, initially |0>
+    #   Qto qubit, target output, initially |0>
+    #
+    #   Qca qubit, control auxiliary, initially |0>
+    #   Qta qubit, target auxiliary, initially |0>
+    #
+    #   Cti classical address, measures Qti
+    #   Cta classical address, measures Qta
+    #   Cci classical address, measures Qci
+    #   Cca classical address, measures Qca
+    #
+    #   CXa classical address, auxiliary used by XOR
+    #
+    # Logically, apply a CNOT to Qci and Qti, and
+    # teleport the result to Qco and Qto.
+    #
+    # Issues:
+    #
+    # There's a question about when to use WAIT,
+    # and what its limitations are.
+    #
+    # And is this doable using only single qubit gates?
+    # (see comments below on precomputing the needed
+    # entangled state and bell measurements w/o CNOT).
+    #
+
+
+    # Set up an entangled resource on Qca, Qco, Qto and
+    # Qta. (ideally, this state is precomputed and can be
+    # stored and passed into this circuit instead, prior to
+    # messing with the critical qubits Qci and Qti?)
+    H Qca
+    CNOT Qca Qco
+    H Qto
+    CNOT Qto Qta
+    CNOT Qco Qto
+
+    # Bell measurement. Implemented using a CNOT here,
+    # but does it need to be? Alternate implementation of
+    # a bell measurement w/o CNOT?
+    CNOT Qci Qca
+    H Qci
+    MEASURE Qci Cci
+    MEASURE Qca Cca
+
+    # Bell measurement
+    CNOT Qti Qta
+    H Qti
+    MEASURE Qti Cti
+    MEASURE Qta Cta
+
+    # Classical circuitry. Presumes an explicit WAIT is not
+    # needed for inline classical circuitry, is that correct?
+    # What does an alternative implementation that uses
+    # WAIT and synchronous classical processing look like?
+    # How much classical control is possible during a WAIT?
+    # Does it depend on the current quantum state?
+    XOR Cti Cci CXa
+    XOR Cca Cta CXa  # implemented as a classical circuit
+
+    # Classically controlled single-qubit gates
+    JUMP-UNLESS @NOXco Cca
+    X Qco
+    LABEL @NOXco
+    JUMP-UNLESS @NOXto Cta
+    X Qto
+    LABEL @NOXto
+    JUMP-UNLESS @NOZco Cci
+    Z Qco
+    LABEL @NOZco
+    JUMP-UNLESS @NOZto Cti
+    Z Qto
+    LABEL @NOZto
